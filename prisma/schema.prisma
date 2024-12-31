@@ -26,6 +26,45 @@ model Post {
     @@index([name])
 }
 
+model Vehicle {
+    id             String   @id @default(cuid())
+    licensePlate   String   @unique
+    makeModel      String
+    trips          Trip[]
+    tripsByMonth   TripSumByMonth[]
+    ownerId        String?
+    owner          User?   @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+}
+
+model Trip {
+    tripId           String      @id
+    vehicleId        String
+    tripStart        DateTime
+    tripEnd          DateTime
+    distanceTraveled Float
+    tripDays         Int
+    tripPrice        Float
+    totalDiscount    Float
+    deliveryFee      Float
+    excessDistance   Float
+    additionalUsage  Float
+    lateFee          Float
+    grossEarned      Float
+    turoFee          Float
+    operationExpense Float
+    netEarned        Float
+    vehicle          Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+}
+
+model PartnerShare {
+    userId               String
+    year                 Int
+    sharePercentage      Float
+    user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, year])
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -63,6 +102,8 @@ model User {
     accounts      Account[]
     sessions      Session[]
     posts         Post[]
+    vehiclesOwned Vehicle[]
+    partnerShares PartnerShare[]
 }
 
 model VerificationToken {
